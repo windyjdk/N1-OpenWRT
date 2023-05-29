@@ -26,28 +26,48 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@main
+      
+      - name: Check server configuration
+      run: |
+        echo "警告⚠"
+        echo "若分配的服务器性能不足，务必及时取消，重新运行！"
+        echo "已知编译成功CPU型号：8370C,8171M"
+        echo "已知性能不足CPU型号：8272CL"
+        echo -e "-------------- ------------CPU信息------------------------------------------\n"
+        echo "CPU物理数量:$(cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l)"
+        echo -e "CPU核心及版本信息：$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+        echo "-------------------------------内存信息-------------------------------------------"
+        echo "已安装内存详细信息："
+        sudo lshw -short -C memory | grep GiB
+        echo -e "\n"
+        echo "-----------------------------硬盘信息---------------------------------------------"
+        echo -e  "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l) \n"
+        echo "硬盘详情："
+        df -Th
 
     - name: Initialization environment
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
         docker rmi `docker images -q`
-          [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
-          sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
-          sudo -E apt-get -y update
-          sudo -E apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
-          sudo -E apt-get -y install $(curl -fsSL https://is.gd/depend_ubuntu2204_openwrt)
-          sudo -E systemctl daemon-reload
-          #sudo -E apt-get -y full-upgrade
-          sudo -E apt-get -y autoremove --purge
-          sudo -E apt-get clean
-          sudo mkdir -p /workdir
-          sudo chown ${USER}:${GROUPS} /workdir
-          sudo timedatectl set-timezone "${TZ}"
+        sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+        sudo -E apt -y purge azure-cli* docker* ghc* zulu* llvm* firefox google* dotnet* powershell* openjdk* mysql* php* mongodb* dotnet* moby* snap* aspnetcore*
+        [ -n "$AGENT_TOOLSDIRECTORY" ] && sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        sudo -E apt update
+        sudo -E apt -y install $(curl -fsSL https://is.gd/depends_ubuntu_2204)
+        sudo -E apt -y autoremove --purge
+        sudo -E systemctl daemon-reload
+        sudo -E apt clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        echo "status=success" >> ${GITHUB_OUTPUT}
+        df -Th
 
     - name: Clone source code
       working-directory: /workdir
@@ -55,6 +75,11 @@ jobs:
         df -hT $PWD
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        cd openwrt
+        useVersionInfo=$(git show -s --date=short --format="Author: %an<br/>date: %cd<br/>commit: %s<br/>commit hash: %H")
+        echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
+        echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
+        echo "DATE1=$(date "+%Y-%m-%d")" >> $GITHUB_ENV
 
     - name: Load custom feeds
       run: |
@@ -85,6 +110,9 @@ jobs:
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
+        rm -rf $GITHUB_WORKSPACE/.git
+        rm -rf $GITHUB_WORKSPACE/opt
+        df -Th
 
     - name: Compile the firmware
       id: compile
@@ -102,7 +130,7 @@ jobs:
       run: |
         cd openwrt
         rm -rf $(ls . | grep -v "^bin$" | xargs) 2>/dev/null
-        df -hT
+        df -hT ${PWD}
 
     - name: Package Armvirt as OpenWrt
       uses: unifreq/openwrt_packit@master
