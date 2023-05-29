@@ -131,7 +131,6 @@ jobs:
 
     - name: Upload firmware to release
       uses: ncipollo/release-action@main
-      if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
       with:
         tag: openwrt_N1_${{ env.PACKAGED_OUTPUTDATE }}
         artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
@@ -159,6 +158,7 @@ jobs:
       uses: dev-drprasad/delete-older-releases@master
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
+        repo: ${{ github.repository }}
         keep_latest: 3
         delete_tags: true
       env:
