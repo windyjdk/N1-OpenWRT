@@ -120,7 +120,7 @@ jobs:
       run: |
         cd openwrt
         rm -rf $(ls . | grep -v "^bin$" | xargs) 2>/dev/null
-        df -hT
+        df -hT ${PWD}
 
     - name: Package Armvirt as OpenWrt
       uses: unifreq/openwrt_packit@master
