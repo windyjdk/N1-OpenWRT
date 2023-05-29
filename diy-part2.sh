@@ -31,3 +31,15 @@ svn co https://github.com/ophub/luci-app-amlogic/trunk/luci-app-amlogic package/
 
 # Add luci-app-openclash
 svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/lean/openclash
+
+# 1.设置OpenWrt 文件的下载仓库
+sed -i "s|amlogic_firmware_repo.*|amlogic_firmware_repo 'https://github.com/windyjdk/openwrt'|g" package/luci-app-amlogic/root/etc/config/amlogic
+
+# 2.设置 Releases 里 Tags 的关键字
+sed -i "s|ARMv8|N1|g" package/luci-app-amlogic/root/etc/config/amlogic
+
+# 3.设置 Releases 里 OpenWrt 文件的后缀
+#sed -i "s|.img.gz|.OPENWRT_SUFFIX|g" package/luci-app-amlogic/root/etc/config/amlogic
+
+# 4.设置 OpenWrt 内核的下载路径
+#sed -i "s|amlogic_kernel_path.*|amlogic_kernel_path 'https://github.com/USERNAME/REPOSITORY'|g" package/luci-app-amlogic/root/etc/config/amlogic
