@@ -136,8 +136,6 @@ jobs:
         tag: openwrt_N1_${{ env.PACKAGED_OUTPUTDATE }}
         artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
         allowUpdates: true
-        removeArtifacts: false
-        replacesArtifacts: true
         token: ${{ secrets.GH_TOKEN }}
         body: |
             ### OpenWrt Image information
