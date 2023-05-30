@@ -23,13 +23,13 @@ sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/auto
 sed -i "s|DISTRIB_REVISION='.*'|DISTRIB_REVISION='R$(date +%Y.%m.%d)'|g" package/lean/default-settings/files/zzz-default-settings
 echo "DISTRIB_SOURCECODE='lede'" >>package/base-files/files/etc/openwrt_release
 
-#set root account for samba4
+#Set root account for samba4
 sed -i 's/invalid users = root/#invalid users = root/g' feeds/packages/net/samba4/files/smb.conf.template
 
 # Add luci-app-amlogic
 svn co https://github.com/ophub/luci-app-amlogic/trunk/luci-app-amlogic package/luci-app-amlogic
 
-# set config for amlogic
+# Set config for amlogic
 sed -i "s|amlogic_firmware_repo.*|amlogic_firmware_repo 'https://github.com/windyjdk/openwrt'|g" package/luci-app-amlogic/root/etc/config/amlogic
 sed -i "s|ARMv8|N1|g" package/luci-app-amlogic/root/etc/config/amlogic
 #sed -i "s|.img.gz|.OPENWRT_SUFFIX|g" package/luci-app-amlogic/root/etc/config/amlogic
