@@ -15,7 +15,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-21.04
-    if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
 
     steps:
       - name: Checkout
@@ -41,7 +40,6 @@ jobs:
 
       - name: Download source code
         id: down
-        if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         run: |
           df -hT ${PWD}
           git clone --depth 1 https://github.com/yunsur/phicomm-n1.git build
@@ -50,7 +48,6 @@ jobs:
 
       - name: Compile Armbian
         id: compile
-        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         run: |
           cd build/
               ./compile.sh BOARD=phicomm-n1 BRANCH=current RELEASE=bullseye BUILD_MINIMAL=no BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img ENABLE_EXTENSIONS=bluez-firmware
@@ -58,7 +55,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Clean up server space
-        if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
+        if: (!cancelled())
         run: |
           cd build/
             sudo rm -rf $(ls . | grep -v "^output$" | xargs) 2>/dev/null
@@ -73,7 +70,6 @@ jobs:
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
-        if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
         with:
           tag: ${{ steps.compile.outputs.build_tag }}
           artifacts: build/output/images/*.img.gz
