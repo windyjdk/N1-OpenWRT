@@ -1,13 +1,8 @@
 name: Build OpenWrt
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '.config'
-      - 'diy-part1.sh'
-      - 'diy-part2.sh'
+  repository_dispatch:
+  workflow_dispatch:
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
