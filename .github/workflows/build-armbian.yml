@@ -21,7 +21,6 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Initialization environment
-        id: init
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
@@ -39,7 +38,6 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Download source code
-        id: down
         run: |
           df -hT ${PWD}
           git clone --depth 1 https://github.com/yunsur/phicomm-n1.git build
