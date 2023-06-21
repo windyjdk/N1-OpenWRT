@@ -122,7 +122,7 @@ jobs:
     - name: Upload firmware to release
       uses: ncipollo/release-action@main
       with:
-        tag: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.PACKAGED_OUTPUTDATE }}
+        tag: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
         allowUpdates: true
         token: ${{ secrets.GH_TOKEN }}
