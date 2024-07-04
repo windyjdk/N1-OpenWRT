@@ -112,7 +112,7 @@ jobs:
       uses: ncipollo/release-action@main
       with:
         tag: OpenWrt_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+        artifacts: ${{ env.FIRMWARE }}/*
         allowUpdates: true
         token: ${{ secrets.GH_TOKEN }}
         body: |
