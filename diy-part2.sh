@@ -20,4 +20,4 @@
 #sed -i 's/OpenWrt/P3TERX-Router/g' package/base-files/files/bin/config_generate
 
 # Add luci-app-openclash
-svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/lean/openclash
+# svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/lean/openclash
